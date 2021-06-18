@@ -207,7 +207,7 @@ class WebSocketTransportHybi extends WebSocketTransport
         );
     }
 
-    public function initiateHandshake(Uri $uri)
+    public function initiateHandshake(Uri $uri, array $headers)
     {
         $challenge = self::randHybiKey();
 
@@ -226,6 +226,10 @@ class WebSocketTransportHybi extends WebSocketTransport
         $request->getHeaders()->addHeaderLine("Sec-WebSocket-Key", $challenge);
         $request->getHeaders()->addHeaderLine("Sec-WebSocket-Version", 13);
         $request->getHeaders()->addHeaderLine("Upgrade", "websocket");
+
+        foreach ($headers as $key => $value) {
+            $request->getHeaders()->addHeaderLine($key, $value);
+        }
 
         $this->setRequest($request);
 

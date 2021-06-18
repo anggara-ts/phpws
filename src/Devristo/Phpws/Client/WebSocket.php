@@ -72,7 +72,7 @@ class WebSocket extends EventEmitter
         $this->dns = $dnsResolverFactory->createCached($server, $loop);
     }
 
-    public function open($timeOut=null)
+    public function open($timeOut=null, $headers = [])
     {
         /**
          * @var $that self
@@ -93,7 +93,7 @@ class WebSocket extends EventEmitter
         $deferred = new Deferred();
 
         $connector->create($uri->getHost(), $uri->getPort() ?: $defaultPort)
-            ->then(function (\React\Stream\DuplexStreamInterface $stream) use ($that, $uri, $deferred, $timeOut){
+            ->then(function (\React\Stream\DuplexStreamInterface $stream) use ($that, $uri, $deferred, $timeOut, $headers){
 
                 if($timeOut){
                     $timeOutTimer = $that->loop->addTimer($timeOut, function() use($deferred, $stream, $that){
@@ -141,7 +141,7 @@ class WebSocket extends EventEmitter
                     $that->emit("message", array("message" => $message));
                 });
 
-                $transport->initiateHandshake($uri);
+                $transport->initiateHandshake($uri, $headers);
                 $that->state = WebSocket::STATE_HANDSHAKE_SENT;
             }, function($reason) use ($that, $deferred)
             {
